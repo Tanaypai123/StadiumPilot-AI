@@ -1,6 +1,7 @@
 import express from 'express'
 import dotenv from 'dotenv'
 import crypto from 'node:crypto'
+import cors from 'cors'
 
 dotenv.config()
 
@@ -43,6 +44,15 @@ console.log(JSON.stringify({
   clientCreated: startupInfo.clientCreated,
   modelCreated: startupInfo.modelCreated,
   port,
+}))
+
+app.use(cors({
+  origin: [
+    "https://stadiumpilot-ai.pages.dev"
+  ],
+  methods: ["GET", "POST", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: false,
 }))
 
 app.use((request, response, next) => {

@@ -47,16 +47,17 @@ console.log(JSON.stringify({
 }))
 
 const corsOptions = {
-  origin: [
-    "https://stadiumpilot-ai.pages.dev"
-  ],
+  origin: (origin, callback) => {
+    // Dynamically reflect the request origin to guarantee CORS compatibility
+    callback(null, true)
+  },
   methods: ["GET", "POST", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: false,
 }
 
 app.use(cors(corsOptions))
-app.options('*', cors(corsOptions))
+app.options(/.*/, cors(corsOptions))
 
 app.use((request, response, next) => {
   const requestId = typeof request.headers['x-request-id'] === 'string' && request.headers['x-request-id'].trim()

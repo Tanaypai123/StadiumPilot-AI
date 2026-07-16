@@ -113,7 +113,7 @@ function Markdown({ text }: { text: string }) {
                 flushList()
                 listType = 'bullet'
               }
-              const itemText = trimmedLine.replace(/^[\*\-]\s+/, '')
+              const itemText = trimmedLine.replace(/^[*-]\s+/, '')
               listItems.push(
                 <li key={i} className="text-inherit leading-relaxed">
                   {parseInline(itemText)}

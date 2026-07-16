@@ -15,9 +15,11 @@ export function useAiRequest<E extends AiEndpoint>(endpoint: E) {
     isLoading: false,
   })
   const abortControllerRef = useRef<AbortController | null>(null)
+  const lastPayloadRef = useRef<Parameters<typeof runAiRequest<E>>[1] | null>(null)
 
   const run = useCallback(
     async (payload: Parameters<typeof runAiRequest<E>>[1]) => {
+      lastPayloadRef.current = payload
       abortControllerRef.current?.abort()
       abortControllerRef.current = new AbortController()
       setState((current) => ({ ...current, isLoading: true, error: null }))
@@ -38,12 +40,12 @@ export function useAiRequest<E extends AiEndpoint>(endpoint: E) {
   )
 
   const retry = useCallback(async () => {
-    if (!state.data) {
+    if (lastPayloadRef.current === null) {
       return null
     }
 
-    return state.data
-  }, [state.data])
+    return run(lastPayloadRef.current)
+  }, [run])
 
   return {
     ...state,

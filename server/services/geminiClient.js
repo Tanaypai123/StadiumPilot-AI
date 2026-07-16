@@ -253,13 +253,6 @@ function isRetryableError(error) {
   return isRetryableStatus(getRetryStatus(error))
 }
 
-function isRetryablePublicError(error) {
-  if (!(error instanceof GeminiServiceError)) {
-    return false
-  }
-
-  return isRetryableStatus(error.status)
-}
 
 function toPublicError(error) {
   if (error instanceof GeminiServiceError) {
@@ -278,6 +271,10 @@ function toPublicError(error) {
   if (metadata.kind === 'fetch') {
     if (metadata.status === 429) {
       return new GeminiServiceError('AI service is busy. Please try again shortly.', 429, errorDetails)
+    }
+
+    if (metadata.status === 400 || metadata.status === 401 || metadata.status === 403 || metadata.status === 404) {
+      return new GeminiServiceError(`AI provider rejected the request with status ${metadata.status}.`, metadata.status, errorDetails)
     }
 
     if (metadata.status && metadata.status >= 500) {
@@ -322,6 +319,14 @@ function serializeSdkError(error) {
   return serialized
 }
 
+export function isConfigured() {
+  return runtimeState.configured
+}
+
+export function getSelectedModel() {
+  return runtimeState.configured ? runtimeState.modelName : null
+}
+
 export async function runGeminiPrompt(prompt, context = {}) {
   if (!runtimeState.configured) {
     throw new GeminiServiceError('AI service is unavailable.', 503)
@@ -329,21 +334,7 @@ export async function runGeminiPrompt(prompt, context = {}) {
 
   const maxAttempts = Math.max(1, runtimeState.maxRetries + 1)
 
-  if (!runtimeState.genAI || !runtimeState.model) {
-    logAiEvent('error', 'ai_request_failed', {
-      endpoint: context.endpoint ?? 'unknown',
-      requestId: context.requestId ?? 'unknown',
-      model: runtimeState.modelName,
-      attempt: 0,
-      maxAttempts,
-      durationMs: 0,
-      retryable: false,
-      status: 503,
-      errorKind: 'config',
-    })
 
-    throw new GeminiServiceError('AI service is unavailable.', 503)
-  }
 
   for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
     const startedAt = Date.now()
@@ -377,7 +368,7 @@ export async function runGeminiPrompt(prompt, context = {}) {
       return text
     } catch (error) {
       const publicError = toPublicError(error)
-      const retryable = isRetryableError(error) || isRetryablePublicError(publicError)
+      const retryable = isRetryableError(error) || isRetryableStatus(publicError.status)
 
       logAiEvent(retryable ? 'warn' : 'error', retryable ? 'ai_request_retry' : 'ai_request_failed', {
         endpoint: context.endpoint ?? 'unknown',
@@ -410,8 +401,6 @@ export async function runGeminiPrompt(prompt, context = {}) {
       await sleep(1500 * attempt)
     }
   }
-
-  throw new GeminiServiceError('AI service is temporarily unavailable. Please retry.', 503)
 }
 
 export function extractJson(text) {

@@ -1,0 +1,269 @@
+openapi: 3.0.3
+info:
+  title: StadiumPilot AI API
+  description: Backend services for the StadiumPilot AI system, providing Gemini-driven assistant support, crowd flow analysis, incident generation, translations, and emergency decisions.
+  version: 1.0.0
+servers:
+  - url: http://localhost:3001/api
+    description: Local development server
+  - url: https://stadiumpilot-ai-tgwi.onrender.com/api
+    description: Production Renders server
+paths:
+  /health:
+    get:
+      summary: Health check
+      description: Returns server status to verify API availability.
+      responses:
+        '200':
+          description: Server is healthy and running.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+  /ai/stadium-assistant:
+    post:
+      summary: AI Stadium Assistant
+      description: Resolves fan queries regarding arena locations, food, accessibility, and parking.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - question
+              properties:
+                question:
+                  type: string
+                  description: Fan query text.
+                  example: "Where is Gate B?"
+                context:
+                  type: object
+                  properties:
+                    stadiumName:
+                      type: string
+                      example: "StadiumPilot Arena"
+                    area:
+                      type: string
+                      example: "Concourse A"
+                    language:
+                      type: string
+                      example: "en"
+      responses:
+        '200':
+          description: Successfully obtained Gemini assistant response.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  response:
+                    type: string
+                    example: "Gate B is located on the East Side next to the ticket counter."
+        '400':
+          description: Invalid request parameters.
+        '429':
+          description: Rate limit exceeded.
+        '502':
+          description: Bad gateway or Gemini API response error.
+        '503':
+          description: Gemini service unavailable or quota exhausted.
+        '504':
+          description: Gateway timeout or network request aborted.
+  /ai/crowd-analysis:
+    post:
+      summary: Crowd Flow Analysis
+      description: Analyzes active occupancy, queue lengths, and gate pressure to output safety warnings and recommendations.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - crowdData
+              properties:
+                crowdData:
+                  type: object
+                  required:
+                    - occupancy
+                    - queueMinutes
+                    - gatePressure
+                  properties:
+                    occupancy:
+                      type: number
+                      minimum: 0
+                      maximum: 100
+                      example: 72
+                    queueMinutes:
+                      type: number
+                      minimum: 0
+                      example: 9
+                    gatePressure:
+                      type: number
+                      minimum: 0
+                      maximum: 100
+                      example: 61
+                    incidentsOpen:
+                      type: number
+                      minimum: 0
+                      example: 2
+      responses:
+        '200':
+          description: Successful crowd analysis report.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  summary:
+                    type: string
+                    example: "Congestion is moderate but gate 2 queue is high."
+                  risks:
+                    type: array
+                    items:
+                      type: string
+                    example: ["Gate 2 bottlenecks"]
+                  recommendations:
+                    type: array
+                    items:
+                      type: string
+                    example: ["Redirect arriving fans to Gate 4"]
+                  confidence:
+                    type: number
+                    example: 0.95
+  /ai/incident-report:
+    post:
+      summary: Incident Report Generator
+      description: Sanitizes and rewrites raw description logs from volunteers/staff into structured incident report fields.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - description
+              properties:
+                description:
+                  type: string
+                  minLength: 10
+                  example: "Minor water spill in aisle 3 near the entrance, someone might slip."
+                location:
+                  type: string
+                  example: "Main stadium concourse"
+                language:
+                  type: string
+                  example: "en"
+      responses:
+        '200':
+          description: Formal incident report generated.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  title:
+                    type: string
+                    example: "Water Spill Hazard - Concourse Block 112"
+                  summary:
+                    type: string
+                    example: "A liquid spill hazard is present near the entrance aisle."
+                  severity:
+                    type: string
+                    enum: [Low, Medium, High, Critical]
+                    example: "Medium"
+                  location:
+                    type: string
+                    example: "Concourse Block 112"
+                  actions:
+                    type: array
+                    items:
+                      type: string
+                    example: ["Dispatch cleaning crew", "Place warning signs"]
+                  language:
+                    type: string
+                    example: "en"
+  /ai/translate:
+    post:
+      summary: Multilingual Translation
+      description: Translates input texts to support tournament operations communication.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - text
+                - targetLanguage
+              properties:
+                text:
+                  type: string
+                  minLength: 1
+                  example: "Please evacuate the stadium immediately through the nearest exit."
+                targetLanguage:
+                  type: string
+                  enum: [en, hi, es, fr]
+                  example: "es"
+      responses:
+        '200':
+          description: Translated text payload.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  translatedText:
+                    type: string
+                    example: "Por favor evapore el estadio inmediatamente por la salida más cercana."
+                  language:
+                    type: string
+                    example: "es"
+  /ai/emergency-decision:
+    post:
+      summary: Emergency Decision Support
+      description: Provides immediate action rules and directives for critical emergency events.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - incident
+              properties:
+                incident:
+                  type: string
+                  minLength: 10
+                  example: "Fire alert detected in the VIP lounge kitchen."
+                context:
+                  type: string
+                  example: "Public safety guidance required."
+      responses:
+        '200':
+          description: Emergency support directive generated.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  priority:
+                    type: string
+                    enum: [Critical, High, Medium, Low]
+                    example: "Critical"
+                  immediateActions:
+                    type: array
+                    items:
+                      type: string
+                    example: ["Sound the alarm", "Initiate VIP sector evacuation"]
+                  escalation:
+                    type: string
+                    example: "Contact local fire department and dispatch emergency responders."
+                  monitoring:
+                    type: string
+                    example: "Monitor CCTV feeds and smoke sensors in block 108."

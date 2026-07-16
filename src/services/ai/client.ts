@@ -95,8 +95,6 @@ async function requestWithRetry<T>(path: string, payload: unknown, options: Requ
       await new Promise((resolve) => window.setTimeout(resolve, attempt * 750))
     }
   }
-
-  throw new Error('Request failed unexpectedly')
 }
 
 export async function runAiRequest<E extends AiEndpoint>(

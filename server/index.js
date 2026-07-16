@@ -2,6 +2,9 @@ import express from 'express'
 import dotenv from 'dotenv'
 import crypto from 'node:crypto'
 import cors from 'cors'
+import helmet from 'helmet'
+import { rateLimit } from 'express-rate-limit'
+
 
 dotenv.config()
 
@@ -58,6 +61,20 @@ const corsOptions = {
 
 app.use(cors(corsOptions))
 app.options(/.*/, cors(corsOptions))
+
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" }
+}))
+
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  limit: 100, // Limit each IP to 100 requests per 15 mins
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+  message: { error: 'Too many requests from this IP, please try again after 15 minutes' }
+})
+app.use('/api', apiLimiter)
+
 
 app.use((request, response, next) => {
   const requestId = typeof request.headers['x-request-id'] === 'string' && request.headers['x-request-id'].trim()

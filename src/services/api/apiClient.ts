@@ -21,19 +21,6 @@ type RequestOptions = {
   timeoutMs?: number
 }
 
-function normalizePath(path: string) {
-  const trimmedPath = path.trim()
-
-  if (trimmedPath === '') {
-    throw new Error('Request path cannot be empty')
-  }
-
-  if (trimmedPath.includes('..')) {
-    throw new Error('Request path cannot contain parent directory traversal')
-  }
-
-  return trimmedPath.startsWith('/') ? trimmedPath : `/${trimmedPath}`
-}
 
 function createTimeoutSignal(signal: AbortSignal | undefined, timeoutMs: number) {
   if (timeoutMs <= 0) {
@@ -57,17 +44,14 @@ function createTimeoutSignal(signal: AbortSignal | undefined, timeoutMs: number)
 }
 
 function buildRequestUrl(path: string) {
-  const normalizedPath = normalizePath(path)
-
-  if (/^https?:\/\//i.test(appEnvironment.apiBaseUrl)) {
-    return new URL(normalizedPath, appEnvironment.apiBaseUrl).toString()
-  }
-
-  return `${appEnvironment.apiBaseUrl.replace(/\/+$/, '')}${normalizedPath}`
+  const baseUrl = appEnvironment.apiBaseUrl.replace(/\/+$/, '')
+  const cleanPath = path.trim().replace(/^\/+/, '')
+  return `${baseUrl}/${cleanPath}`
 }
 
 export async function apiRequest<T>(path: string, options: RequestOptions = {}) {
   const requestUrl = buildRequestUrl(path)
+  console.log(`[API Request] Fetching URL: ${requestUrl}`)
   const requestBody =
     options.body === undefined
       ? undefined

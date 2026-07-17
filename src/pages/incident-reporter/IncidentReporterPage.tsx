@@ -144,7 +144,7 @@ export default function IncidentReporterPage() {
         <Card>
           <CardHeader>
             <CardTitle>Incident form</CardTitle>
-            <CardDescription>Report operational issues using dummy form state only.</CardDescription>
+            <CardDescription>Report tournament operational incidents with instant validation.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-5">
             <TextField

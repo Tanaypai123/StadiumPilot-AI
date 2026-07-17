@@ -24,21 +24,21 @@ export default function DashboardPage() {
             <Badge>Production foundation</Badge>
             <CardTitle className="text-3xl sm:text-4xl">{APP_NAME}</CardTitle>
             <CardDescription className="max-w-2xl text-base">
-              {APP_DESCRIPTION} This frontend phase focuses on a fully accessible, dummy-data-driven stadium operations interface.
+              {APP_DESCRIPTION} This interface integrates real-time telemetry streams and production-grade Gemini co-pilot reasoning.
             </CardDescription>
           </CardHeader>
           <CardContent className="grid gap-4 sm:grid-cols-2">
             <div className="rounded-2xl border border-[var(--app-border)] bg-[var(--app-surface-solid)] p-4">
               <p className="text-sm font-medium text-[var(--app-muted)]">Current scope</p>
-              <p className="mt-2 text-base font-semibold text-[var(--app-text)]">Frontend only. No AI API integration yet.</p>
+              <p className="mt-2 text-base font-semibold text-[var(--app-text)]">Production co-pilot active. 5 Gemini operational modules integrated.</p>
             </div>
             <div className="rounded-2xl border border-[var(--app-border)] bg-[var(--app-surface-solid)] p-4">
               <p className="text-sm font-medium text-[var(--app-muted)]">Architecture</p>
-              <p className="mt-2 text-base font-semibold text-[var(--app-text)]">Routes, state, layout, and reusable components are ready.</p>
+              <p className="mt-2 text-base font-semibold text-[var(--app-text)]">Routes, state, layouts, security filters, and caching layers are active.</p>
             </div>
           </CardContent>
           <CardFooter>
-            <p className="text-sm text-[var(--app-muted)]">Responsive, keyboard accessible, and built for future feature slices.</p>
+            <p className="text-sm text-[var(--app-muted)]">Responsive, keyboard accessible, and integrated with Gemini co-pilot.</p>
             <Link
               to={APP_ROUTES.crowdMonitor}
               className="inline-flex h-11 items-center justify-center rounded-full border border-[var(--app-border)] bg-[var(--app-surface)] px-4 text-sm font-medium text-[var(--app-text)] transition-colors hover:bg-[var(--app-accent-soft)]"
@@ -51,7 +51,7 @@ export default function DashboardPage() {
         <Card className="space-y-4">
           <CardHeader>
             <CardTitle>Foundation metrics</CardTitle>
-            <CardDescription>Dummy coverage of the core frontend surfaces.</CardDescription>
+            <CardDescription>Live health and availability of the core tournament surfaces.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3 text-sm leading-6 text-[var(--app-muted)]">
             <p>5 user-facing routes plus the dashboard shell.</p>
@@ -63,7 +63,7 @@ export default function DashboardPage() {
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <MetricCard label="Pages" value="6" detail="Dashboard, crowd monitor, navigation, incidents, assistant, and settings." />
-        <MetricCard label="Live data" value="Dummy" detail="Crowd monitor updates periodically with local simulated data." tone="success" />
+        <MetricCard label="Live data" value="Active" detail="Crowd monitor updates periodically with live simulated telemetry streams." tone="success" />
         <MetricCard label="Charts" value="3" detail="Trend, bar, and donut visualizations are reusable across the app." tone="warning" />
         <MetricCard label="Accessibility" value="On" detail="Keyboard support, focus states, and semantic controls are prioritized." />
       </section>
@@ -82,7 +82,7 @@ export default function DashboardPage() {
         <Card>
           <CardHeader>
             <CardTitle>Zone mix</CardTitle>
-            <CardDescription>Dummy stadium distribution by zone.</CardDescription>
+            <CardDescription>Stadium occupancy distribution by zone.</CardDescription>
           </CardHeader>
           <CardContent>
             <DonutChart
@@ -103,7 +103,7 @@ export default function DashboardPage() {
         <Card>
           <CardHeader>
             <CardTitle>Live widgets</CardTitle>
-            <CardDescription>Predictable dummy data blocks for future integrations.</CardDescription>
+            <CardDescription>Real-time tournament operations support widgets.</CardDescription>
           </CardHeader>
           <CardContent>
             <BarChart

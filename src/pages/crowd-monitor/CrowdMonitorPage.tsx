@@ -99,7 +99,7 @@ export default function CrowdMonitorPage() {
           <Badge variant={status.variant}>{status.label}</Badge>
           <h1 className="mt-3 text-3xl font-semibold tracking-tight text-[var(--app-text)]">Crowd Monitor</h1>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-[var(--app-muted)]">
-            Dummy live data, crowd cards, status indicators, and charts for stadium occupancy monitoring.
+            Simulated live telemetry, zone status cards, and charts for stadium occupancy monitoring.
           </p>
         </div>
         <div className="text-sm text-[var(--app-muted)]">
@@ -171,7 +171,7 @@ export default function CrowdMonitorPage() {
         <Card>
           <CardHeader>
             <CardTitle>Zone pressure chart</CardTitle>
-            <CardDescription>Dummy status indicators for crowd pressure by zone.</CardDescription>
+            <CardDescription>Active status indicators showing relative crowd pressure by zone.</CardDescription>
           </CardHeader>
           <CardContent>
             <BarChart ariaLabel="Crowd pressure bar chart" data={snapshot.zoneStatus} />

@@ -23,8 +23,18 @@ export const NAVIGATION_ITEMS = [
   },
   {
     label: 'AI Assistant',
-    description: 'Chat interface only',
+    description: 'Operations co-pilot chat',
     to: APP_ROUTES.aiAssistant,
+  },
+  {
+    label: 'Tournament Experience',
+    description: 'Fan guidance and accessibility',
+    to: APP_ROUTES.experience,
+  },
+  {
+    label: 'Smart Operations',
+    description: 'Scheduling and alerts',
+    to: APP_ROUTES.operations,
   },
   {
     label: 'Settings',

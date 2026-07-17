@@ -47,10 +47,20 @@ const endpointPaths: Record<AiEndpoint, string> = {
   emergencyDecision: 'emergency-decision',
 }
 
+/**
+ * Builds a string representation of the endpoint and payload context to use as cache key.
+ * @param endpoint AI operational mode
+ * @param payload Operational parameters
+ * @returns Serialized cache key
+ */
 function buildCacheKey(endpoint: AiEndpoint, payload: unknown) {
   return `${endpoint}:${JSON.stringify(payload)}`
 }
 
+/**
+ * Enforces client-side rate limits by tracking time-window thresholds.
+ * Throws if the current frequency exceeds permitted limit counts.
+ */
 function enforceClientRateLimit() {
   const now = Date.now()
   const cutoff = now - appEnvironment.apiRateLimitWindowMs
@@ -65,6 +75,15 @@ function enforceClientRateLimit() {
   requestTimestamps.push(now)
 }
 
+/**
+ * Executes a network call with progressive backoff retries.
+ * Retries on transient rate limits (429), gateway issues (5xx), timeouts, and aborts.
+ * 
+ * @param path Target request route path.
+ * @param payload Operational payload parameters.
+ * @param options Request controller options.
+ * @returns Successful API response payload.
+ */
 async function requestWithRetry<T>(path: string, payload: unknown, options: RequestOptions = {}) {
   const controller = new AbortController()
   if (options.signal) {
@@ -97,6 +116,16 @@ async function requestWithRetry<T>(path: string, payload: unknown, options: Requ
   }
 }
 
+/**
+ * Triggers a validated and cached AI co-pilot operation request.
+ * Coordinates client-side rate limits, parallel deduplication, in-memory caching,
+ * and transient request retries.
+ * 
+ * @param endpoint AI operational mode (e.g. stadiumAssistant, crowdAnalysis, etc.)
+ * @param payload Matching operational input parameters.
+ * @param options Network properties (e.g. AbortSignal).
+ * @returns Parsed structured AI response.
+ */
 export async function runAiRequest<E extends AiEndpoint>(
   endpoint: E,
   payload: EndpointRequestMap[E],

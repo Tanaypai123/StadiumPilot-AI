@@ -21,6 +21,10 @@ const runtimeState = {
   model: null,
 }
 
+/**
+ * Custom service error wrapping exceptions thrown by the Gemini SDK.
+ * Propagates correct HTTP statuses and serializable details.
+ */
 export class GeminiServiceError extends Error {
   constructor(message, status = 502, details = {}) {
     super(message)
@@ -69,6 +73,13 @@ export function printFullProviderError(error) {
   console.error("===========================");
 }
 
+/**
+ * Asynchronously initializes the Gemini client and finds the best non-deprecated available model.
+ * Performs progressive self-test evaluations to guarantee provider accessibility.
+ * 
+ * @param {object} config - Configuration mapping apiKey, requestedModelName, and request limits.
+ * @returns {Promise<object>} Startup telemetry configuration log details.
+ */
 export async function configureGeminiClient(config) {
   if (!config.apiKey) {
     throw new Error('GEMINI_API_KEY is missing from the loaded environment')
@@ -319,14 +330,30 @@ function serializeSdkError(error) {
   return serialized
 }
 
+/**
+ * Checks if the Gemini client has been successfully configured.
+ * @returns {boolean} True if ready.
+ */
 export function isConfigured() {
   return runtimeState.configured
 }
 
+/**
+ * Gets the name of the currently active Gemini model candidate.
+ * @returns {string|null} Active model name or null.
+ */
 export function getSelectedModel() {
   return runtimeState.configured ? runtimeState.modelName : null
 }
 
+/**
+ * Runs a prompt query against the Gemini API.
+ * Handles transient error retries (with exponential backoff) and formats standard public errors.
+ * 
+ * @param {string} prompt - Security XML-contained operational prompt.
+ * @param {object} [context={}] - Operational tags like endpoint and requestId.
+ * @returns {Promise<string>} Gemini response text.
+ */
 export async function runGeminiPrompt(prompt, context = {}) {
   if (!runtimeState.configured) {
     throw new GeminiServiceError('AI service is unavailable.', 503)
@@ -403,6 +430,13 @@ export async function runGeminiPrompt(prompt, context = {}) {
   }
 }
 
+/**
+ * Sanitizes and extracts a structured JSON object from the Gemini response text.
+ * Throws if the response does not contain a valid JSON parse.
+ * 
+ * @param {string} text - Raw Gemini response output text.
+ * @returns {object} Parsed JSON payload object.
+ */
 export function extractJson(text) {
   const parsed = safeJsonParse(text)
   if (!parsed) {

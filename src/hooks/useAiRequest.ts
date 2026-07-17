@@ -8,6 +8,14 @@ type UseAiRequestState<T> = {
   isLoading: boolean
 }
 
+/**
+ * React hook that wraps the runAiRequest client function.
+ * Manages loading status, error tracking, last-payload references for retries,
+ * and automatic network request cancellation.
+ * 
+ * @param endpoint AI operational mode.
+ * @returns State data, error status, loading boolean, run callback, retry callback, and abort callback.
+ */
 export function useAiRequest<E extends AiEndpoint>(endpoint: E) {
   const [state, setState] = useState<UseAiRequestState<AiResponseMap[E]>>({
     data: null,

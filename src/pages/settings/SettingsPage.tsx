@@ -39,7 +39,7 @@ export default function SettingsPage() {
           Settings
         </h1>
         <p className="mt-2 max-w-3xl text-sm leading-6 text-[var(--app-muted)]">
-          Theme, language, and accessibility options are controlled locally with safe dummy state.
+          Theme, language, and accessibility options are controlled locally with safe client-side state.
         </p>
       </div>
 
@@ -57,7 +57,7 @@ export default function SettingsPage() {
         <Card>
           <CardHeader>
             <CardTitle>Language</CardTitle>
-            <CardDescription>Dummy language preference for the frontend shell.</CardDescription>
+            <CardDescription>Active language preference configuration.</CardDescription>
           </CardHeader>
           <CardContent>
             <SelectField
@@ -107,7 +107,7 @@ export default function SettingsPage() {
             <p>Mode: {appEnvironment.appMode}</p>
             <p>Version: {appEnvironment.appVersion}</p>
             <p>API base URL: {appEnvironment.apiBaseUrl}</p>
-            <p>Mock mode: {appEnvironment.enableMocks ? 'Enabled' : 'Disabled'}</p>
+            <p>Offline simulation mode: {appEnvironment.enableMocks ? 'Enabled' : 'Disabled'}</p>
             <Button
               type="button"
               variant="secondary"

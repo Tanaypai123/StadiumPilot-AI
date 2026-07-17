@@ -9,7 +9,10 @@ const SmartNavigationPage = lazy(() => import('@/pages/smart-navigation/SmartNav
 const IncidentReporterPage = lazy(() => import('@/pages/incident-reporter/IncidentReporterPage'))
 const AIAssistantPage = lazy(() => import('@/pages/ai-assistant/AIAssistantPage'))
 const SettingsPage = lazy(() => import('@/pages/settings/SettingsPage'))
+const ExperiencePage = lazy(() => import('@/pages/experience/ExperiencePage'))
+const OperationsPage = lazy(() => import('@/pages/operations/OperationsPage'))
 const NotFoundPage = lazy(() => import('@/pages/not-found/NotFoundPage'))
+
 
 export function AppRouter() {
   return (
@@ -20,11 +23,11 @@ export function AppRouter() {
         <Route path="smart-navigation" element={<SmartNavigationPage />} />
         <Route path="incident-reporter" element={<IncidentReporterPage />} />
         <Route path="ai-assistant" element={<AIAssistantPage />} />
+        <Route path="experience" element={<ExperiencePage />} />
+        <Route path="operations" element={<OperationsPage />} />
         <Route path="settings" element={<SettingsPage />} />
       </Route>
       <Route path="/home" element={<Navigate to="/" replace />} />
-      <Route path="/operations" element={<Navigate to="/crowd-monitor" replace />} />
-      <Route path="/experience" element={<Navigate to="/smart-navigation" replace />} />
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
   )

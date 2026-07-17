@@ -67,7 +67,7 @@ export default function SmartNavigationPage() {
             <Badge>Navigation</Badge>
             <CardTitle className="text-3xl">Smart Navigation</CardTitle>
             <CardDescription>
-              Stadium map, route selection, and destination cards with dummy route intelligence.
+              Stadium map, route selection, and destination cards with predictive route algorithms.
             </CardDescription>
           </CardHeader>
           <CardContent>

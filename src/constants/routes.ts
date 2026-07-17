@@ -5,4 +5,6 @@ export const APP_ROUTES = {
   incidentReporter: '/incident-reporter',
   aiAssistant: '/ai-assistant',
   settings: '/settings',
+  experience: '/experience',
+  operations: '/operations',
 } as const

@@ -316,4 +316,44 @@ describe('Gemini Client Service Layer', () => {
       runGeminiPrompt('Test prompt', { endpoint: 'stadiumAssistant' })
     ).rejects.toThrow('AI service is busy')
   })
+
+  test('configureGeminiClient throws error if apiKey is missing', async () => {
+    await expect(
+      configureGeminiClient({})
+    ).rejects.toThrow('GEMINI_API_KEY is missing from the loaded environment')
+  })
+
+  test('configureGeminiClient handles transient errors during self-test and retries successfully', async () => {
+    // Enable failure for self-test
+    mockState.shouldFail = true
+    mockState.failCount = 1 // Fail first attempt, succeed on second
+    mockState.errorToThrow = new GoogleGenerativeAIFetchError('Quota exceeded', 429)
+    mockState.textResponse = 'Success after retry'
+
+    const info = await configureGeminiClient({
+      apiKey: 'AIzaSyKey',
+      requestedModelName: 'gemini-2.5-flash',
+      requestTimeoutMs: 12000,
+    })
+    expect(info.selectedModel).toBe('gemini-2.5-flash')
+  })
+
+  test('configureGeminiClient throws if self-test response is empty', async () => {
+    mockState.shouldFail = false
+    mockState.textResponse = '' // Empty response
+
+    await expect(
+      configureGeminiClient({
+        apiKey: 'AIzaSyKey',
+        requestedModelName: 'gemini-fail-empty',
+      })
+    ).rejects.toThrow('Self-test returned empty response')
+  })
+
+  test('serializeSdkError serializes non-Error correctly', async () => {
+    const stringError = 'Just a string error exception'
+    const { printFullProviderError } = await import('./geminiClient.js')
+    printFullProviderError(null)
+    printFullProviderError(stringError)
+  })
 })

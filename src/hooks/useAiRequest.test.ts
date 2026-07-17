@@ -108,4 +108,19 @@ describe('useAiRequest hook', () => {
 
     globalThis.AbortController = originalAbortController
   })
+
+  test('should handle raw string exceptions', async () => {
+    vi.mocked(runAiRequest).mockRejectedValueOnce('Raw string error' as any)
+
+    const hook = useAiRequest('stadiumAssistant')
+    
+    await expect(hook.run({ question: 'Hi' })).rejects.toBe('Raw string error')
+    expect(mockState.error).toBe('AI request failed')
+  })
+
+  test('should handle abort when abortController is null', () => {
+    const hook = useAiRequest('stadiumAssistant')
+    // No run called, so abortController is null
+    expect(() => hook.abort()).not.toThrow()
+  })
 })

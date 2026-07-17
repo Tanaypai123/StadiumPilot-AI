@@ -174,4 +174,38 @@ describe('Frontend AI Client Layer', () => {
       runAiRequest('stadiumAssistant', { question: 'Empty response test' })
     ).rejects.toThrow('Empty AI response received')
   })
+
+  test('runAiRequest retries on rate limits (429)', async () => {
+    const { ApiError } = await import('@/services/api/apiClient')
+    mockApiRequest
+      .mockRejectedValueOnce(new ApiError('Too many requests', 429))
+      .mockResolvedValueOnce({ response: 'Recovered after rate limit' })
+
+    const response = await runAiRequest('stadiumAssistant', { question: 'Rate limit retry test' })
+    expect(response).toEqual({ response: 'Recovered after rate limit' })
+    expect(mockApiRequest).toHaveBeenCalledTimes(2)
+  })
+
+  test('runAiRequest fails immediately on non-retryable ApiErrors (400)', async () => {
+    const { ApiError } = await import('@/services/api/apiClient')
+    mockApiRequest.mockRejectedValueOnce(new ApiError('Bad request parameters', 400))
+
+    await expect(
+      runAiRequest('stadiumAssistant', { question: 'Non-retryable test' })
+    ).rejects.toThrow('Bad request parameters')
+    expect(mockApiRequest).toHaveBeenCalledTimes(1)
+  })
+
+  test('runAiRequest retries when ApiError with AbortError name is encountered', async () => {
+    const { ApiError } = await import('@/services/api/apiClient')
+    const abortErr = new ApiError('Request aborted', 499)
+    abortErr.name = 'AbortError'
+    mockApiRequest
+      .mockRejectedValueOnce(abortErr)
+      .mockResolvedValueOnce({ response: 'Recovered after abort' })
+
+    const response = await runAiRequest('stadiumAssistant', { question: 'Abort error retry test' })
+    expect(response).toEqual({ response: 'Recovered after abort' })
+    expect(mockApiRequest).toHaveBeenCalledTimes(2)
+  })
 })
